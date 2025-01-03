@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Setup Admin - Simple Cloud</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gradient-to-br from-blue-100 to-indigo-100 min-h-screen">
+    <div class="min-h-screen flex flex-col items-center justify-center p-4">
+        <div class="max-w-md w-full space-y-8 bg-white rounded-xl shadow-lg p-8">
+            <div class="text-center">
+                <h1 class="text-3xl font-bold text-gray-900">Admin Setup</h1>
+                <p class="mt-2 text-sm text-gray-600">Create the administrator account</p>
+            </div>
+
+            {{if .}}
+            <div class="bg-red-50 border-l-4 border-red-400 p-4 mb-4" role="alert">
+                <p class="text-red-700">{{.}}</p>
+            </div>
+            {{end}}
+
+            <form method="POST" action="/setup-admin" class="mt-8 space-y-6">
+                <div class="space-y-4">
+                    <div>
+                        <label for="setup_token" class="block text-sm font-medium text-gray-700">
+                            Setup Token
+                        </label>
+                        <input id="setup_token"
+                               name="setup_token"
+                               type="text"
+                               required
+                               class="mt-1 block w-full px-3 py-2 bg-gray-50 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                               placeholder="Enter setup token">
+                    </div>
+
+                    <div>
+                        <label for="email" class="block text-sm font-medium text-gray-700">
+                            Email address
+                        </label>
+                        <input id="email"
+                               name="email"
+                               type="email"
+                               required
+                               class="mt-1 block w-full px-3 py-2 bg-gray-50 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                               placeholder="admin@example.com">
+                    </div>
+
+                    <div>
+                        <label for="password" class="block text-sm font-medium text-gray-700">
+                            Password
+                        </label>
+                        <input id="password"
+                               name="password"
+                               type="password"
+                               required
+                               minlength="8"
+                               class="mt-1 block w-full px-3 py-2 bg-gray-50 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                               placeholder="••••••••">
+                    </div>
+                </div>
+
+                <div>
+                    <button type="submit"
+                            class="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
+                        Create Admin Account
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</body>
+</html>
