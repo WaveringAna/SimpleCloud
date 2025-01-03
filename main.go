@@ -220,6 +220,7 @@ func (fs *FileService) LoginHandler(w http.ResponseWriter, r *http.Request) {
 	http.Redirect(w, r, "/", http.StatusSeeOther)
 }
 
+// LogoutHandler invalidates the user's session
 func (fs *FileService) LogoutHandler(w http.ResponseWriter, r *http.Request) {
 	http.SetCookie(w, &http.Cookie{
 		Name:     "auth_token",
@@ -251,9 +252,11 @@ func (fs *FileService) RenderHomePage(w http.ResponseWriter, r *http.Request) {
 	data := struct {
 		Files []File
 		Email string
+		User  User
 	}{
 		Files: files,
 		Email: user.Email,
+		User:  user,
 	}
 
 	fs.templates.ExecuteTemplate(w, "index.html", data)
@@ -466,6 +469,10 @@ func (fs *FileService) UsersListHandler(w http.ResponseWriter, r *http.Request) 
 	fs.templates.ExecuteTemplate(w, "users-list.html", users)
 }
 
+// ProfileHandler manages user profile updates
+// Requires authentication via authMiddleware
+// GET: Displays the profile edit form
+// POST: Updates user email and/or password
 func (fs *FileService) ProfileHandler(w http.ResponseWriter, r *http.Request) {
 	userID := r.Header.Get("User-ID")
 
@@ -476,7 +483,14 @@ func (fs *FileService) ProfileHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	if r.Method == "GET" {
-		fs.templates.ExecuteTemplate(w, "profile.html", user)
+		data := struct {
+			User  User
+			Error string
+		}{
+			User:  user,
+			Error: "",
+		}
+		fs.templates.ExecuteTemplate(w, "profile.html", data)
 		return
 	}
 
@@ -511,6 +525,15 @@ func (fs *FileService) ProfileHandler(w http.ResponseWriter, r *http.Request) {
 	http.Redirect(w, r, "/", http.StatusSeeOther)
 }
 
+// main initializes and starts the file storage web service
+// It sets up:
+// - File storage service with local directory
+// - Router with middleware for admin checks
+// - Public routes (login, register, setup)
+// - Protected routes requiring authentication
+// - Admin-only routes
+// - Static file serving
+// The server listens on port 8080
 func main() {
 	fileService, err := NewFileService("./storage")
 	if err != nil {
@@ -519,6 +542,7 @@ func main() {
 
 	router := mux.NewRouter()
 
+	// Middleware to check for admin setup and redirect if needed
 	router.Use(func(next http.Handler) http.Handler {
 		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 			// Skip admin check for static files and certain routes
